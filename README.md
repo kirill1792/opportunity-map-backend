@@ -9,4 +9,4 @@ FastAPI backend for Opportunity Map.
 - Matching score
 - Skill gap analysis
 - Deadlines
-- PostgreSQL persistence
+- PostgreSQL persistence 
