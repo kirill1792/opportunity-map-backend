@@ -16,4 +16,4 @@ def health_check():
 app.include_router(students_router)
 
 #cd ~/Projects/opportunity-map/opportunity-map-backend
-#.venv/bin/python -m uvicorn app.main:app --reload
+# local dev entrypoint: .venv/bin/python -m uvicorn app.main:app --reload
