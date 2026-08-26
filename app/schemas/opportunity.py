@@ -1,11 +1,18 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator, field_validator
 
 from app.models.enums import (
     OpportunityFormat,
     OpportunityLevel,
     OpportunityType,
+)
+
+from app.core.taxonomy import (
+    ALLOWED_FIELDS,
+    validate_allowed_value,
+    validate_disjoint_skill_groups,
+    validate_skill_requirements,
 )
 
 
@@ -23,8 +30,7 @@ class OpportunityBase(BaseModel):
 
     image_url: HttpUrl | None = None
 
-    field: str | None = Field(
-        default=None,
+    field: str = Field(
         max_length=100,
     )
 
@@ -61,6 +67,15 @@ class OpportunityBase(BaseModel):
     nice_to_have_skills: dict[str, int] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
 
+    @field_validator("field")
+    @classmethod
+    def validate_field(cls, value: str) -> str:
+        return validate_allowed_value(
+            value=value,
+            allowed_values=ALLOWED_FIELDS,
+            field_name="field",
+        )
+
     @model_validator(mode="after")
     def validate_dates(self) -> "OpportunityBase":
         if (
@@ -75,23 +90,21 @@ class OpportunityBase(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_skill_levels(self) -> "OpportunityBase":
-        skill_groups = {
-            "required_skills": self.required_skills,
-            "nice_to_have_skills": self.nice_to_have_skills,
-        }
+    def validate_skill_requirements_data(self) -> "OpportunityBase":
+        self.required_skills = validate_skill_requirements(
+            skills=self.required_skills,
+            field_name="required_skills",
+        )
 
-        for field_name, skills in skill_groups.items():
-            for skill_name, level in skills.items():
-                if not skill_name.strip():
-                    raise ValueError(
-                        f"{field_name} не может содержать пустое название навыка"
-                    )
+        self.nice_to_have_skills = validate_skill_requirements(
+            skills=self.nice_to_have_skills,
+            field_name="nice_to_have_skills",
+        )
 
-                if not 0 <= level <= 5:
-                    raise ValueError(
-                        f"Уровень навыка '{skill_name}' должен быть от 0 до 5"
-                    )
+        validate_disjoint_skill_groups(
+            required_skills=self.required_skills,
+            nice_to_have_skills=self.nice_to_have_skills,
+        )
 
         return self
 
@@ -150,6 +163,43 @@ class OpportunityUpdate(BaseModel):
     is_active: bool | None = None
 
     image_url: HttpUrl | None = None
+
+    @field_validator("field")
+    @classmethod
+    def validate_field(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+
+        return validate_allowed_value(
+            value=value,
+            allowed_values=ALLOWED_FIELDS,
+            field_name="field",
+        )
+
+    @model_validator(mode="after")
+    def validate_skill_requirements_data(self) -> "OpportunityUpdate":
+        if self.required_skills is not None:
+            self.required_skills = validate_skill_requirements(
+                skills=self.required_skills,
+                field_name="required_skills",
+            )
+
+        if self.nice_to_have_skills is not None:
+            self.nice_to_have_skills = validate_skill_requirements(
+                skills=self.nice_to_have_skills,
+                field_name="nice_to_have_skills",
+            )
+
+        if (
+                self.required_skills is not None
+                and self.nice_to_have_skills is not None
+        ):
+            validate_disjoint_skill_groups(
+                required_skills=self.required_skills,
+                nice_to_have_skills=self.nice_to_have_skills,
+            )
+
+        return self
 
 
 class OpportunityRead(OpportunityBase):

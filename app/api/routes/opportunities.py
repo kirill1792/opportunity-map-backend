@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.taxonomy import validate_disjoint_skill_groups
 from app.db.database import get_db
 from app.models.enums import (
     OpportunityFormat,
@@ -184,6 +185,26 @@ def update_opportunity(
         "end_date",
         opportunity.end_date,
     )
+
+    final_required_skills = update_data.get(
+        "required_skills",
+        opportunity.required_skills,
+    )
+    final_nice_to_have_skills = update_data.get(
+        "nice_to_have_skills",
+        opportunity.nice_to_have_skills,
+    )
+
+    try:
+        validate_disjoint_skill_groups(
+            required_skills=final_required_skills,
+            nice_to_have_skills=final_nice_to_have_skills,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
 
     if (
         new_start_date is not None

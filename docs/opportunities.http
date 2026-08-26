@@ -1,0 +1,47 @@
+### Создать opportunity
+POST http://127.0.0.1:8000/opportunities
+Content-Type: application/json
+
+{
+  "title": "Т-Банк: стажировка на позицию аналитика.",
+  "description": "Оплачиваемая стажировка для начинающих специалистов.",
+  "source_url": "https://education.tbank.ru/start/analyst/",
+  "type": "internship",
+  "image_url": "https://res.cloudinary.com/nu2kfjya/image/upload/v1785080510/aHR0cHM6Ly9jZG4udGJhbmsucnUvc3RhdGljL3BhZ2VzL2ZpbGVzLzkzZjhmZGNlLTIwYWMtNDYxZi05NWZhLWI4YTZiNTM1MmIyNS5wbmc_hyql1e.webp",
+  "field": "IT",
+  "level": "beginner",
+  "format": "hybrid",
+  "location": null,
+  "deadline": null,
+  "start_date": null,
+  "end_date": null,
+  "language": "Русский",
+  "is_paid": true,
+  "estimated_effort": 20,
+  "eligibility": "Студенты и начинающие специалисты",
+  "required_skills": {
+    "Командная работа": 3,
+    "Математика": 4,
+    "Статистика": 3,
+    "Аналитика": 3,
+    "Программирование": 2
+  },
+  "nice_to_have_skills": {
+    "Python": 2,
+    "NumPy": 3,
+    "Pandas": 2,
+    "Matplotlib": 2,
+    "SQL": 1
+  },
+  "tags": [
+    "стажировка",
+    "аналитика",
+    "статистика"
+  ]
+}
+
+###
+GET http://127.0.0.1:8000/opportunities
+
+###
+GET http://127.0.0.1:8000/opportunities/1

@@ -1,0 +1,64 @@
+### Health check
+GET http://127.0.0.1:8000/health
+
+
+### Register profile
+POST http://127.0.0.1:8000/dev/auth/register-profile
+Content-Type: application/json
+
+{
+  "name": "Kirill",
+  "university": "HSE University",
+  "year_of_study": 1,
+  "degree_direction": "Applied Mathematics",
+  "interests": ["machine_learning", "data_science", "algorithms"],
+  "skills": [
+    {
+      "skill": "python",
+      "level": "intermediate"
+    },
+    {
+      "skill": "sql",
+      "level": "beginner"
+    }
+  ],
+  "preferred_formats": ["internship", "hackathon"],
+  "available_hours_per_week": 8,
+  "goals": ["find_internship", "build_portfolio"],
+  "experience_level": "beginner",
+  "portfolio_links": ["https://github.com/kirill1792"]
+}
+
+
+### Login by ID
+POST http://127.0.0.1:8000/dev/auth/login-by-id
+Content-Type: application/json
+
+{
+  "user_id": 1
+}
+
+
+### Get my profile
+GET http://127.0.0.1:8000/profile/me
+X-Dev-User-Id: 1
+
+
+### Update my profile
+PUT http://127.0.0.1:8000/profile/me
+Content-Type: application/json
+X-Dev-User-Id: 2
+
+{
+  "name": "Kirill",
+  "year_of_study": 1,
+  "degree_direction": "Applied Data Analysis",
+  "university": "HSE",
+  "experience_level": "intermediate",
+  "available_hours_per_week": 12
+}
+
+
+### Wrong user ID
+GET http://127.0.0.1:8000/profile/me
+X-Dev-User-Id: 999
