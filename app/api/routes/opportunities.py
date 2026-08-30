@@ -12,7 +12,19 @@ from app.models.enums import (
     OpportunityType,
 )
 from app.models.opportunity import Opportunity
-from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate, OpportunityRead
+from app.schemas.opportunity import (
+    OpportunityCreate,
+    OpportunityRead,
+    OpportunityUpdate,
+    OpportunityWithMatch,
+)
+from datetime import datetime, timezone
+
+from app.api.dependencies.auth import get_optional_current_user
+from app.models.student_profile import StudentProfile
+from app.models.user import User
+from app.services.matching.engine import match_opportunity
+
 
 router = APIRouter(prefix="/opportunities", tags=["opportunities"])
 
@@ -73,7 +85,7 @@ def create_opportunity(
 
 @router.get(
     "",
-    response_model=list[OpportunityRead],
+    response_model=list[OpportunityWithMatch],
 )
 def get_opportunities(
     opportunity_type: OpportunityType | None = Query(
@@ -93,8 +105,9 @@ def get_opportunities(
     include_inactive: bool = False,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
+    current_user: User | None = Depends(get_optional_current_user),
     db: Session = Depends(get_db),
-) -> list[Opportunity]:
+) -> list[OpportunityWithMatch]:
     statement = select(Opportunity)
 
     if not include_inactive:
@@ -136,22 +149,79 @@ def get_opportunities(
         .limit(limit)
     )
 
+    # Здесь пока действительно ORM-объекты.
     opportunities = db.scalars(statement).all()
 
-    return list(opportunities)
+    profile = get_profile_for_user(
+        db,
+        current_user,
+    )
+    calculation_time = datetime.now(timezone.utc)
 
+    # А здесь ORM преобразуется в API-схемы с optional matching.
+    return [
+        build_opportunity_response(
+            opportunity,
+            profile=profile,
+            now=calculation_time,
+        )
+        for opportunity in opportunities
+    ]
+
+def get_profile_for_user(
+    db: Session,
+    current_user: User | None,
+) -> StudentProfile | None:
+    if current_user is None:
+        return None
+
+    return db.scalar(
+        select(StudentProfile).where(
+            StudentProfile.user_id == current_user.id
+        )
+    )
+
+
+def build_opportunity_response(
+    opportunity: Opportunity,
+    *,
+    profile: StudentProfile | None,
+    now: datetime,
+) -> OpportunityWithMatch:
+    response = OpportunityWithMatch.model_validate(opportunity)
+
+    if profile is not None:
+        response.match = match_opportunity(
+            profile,
+            opportunity,
+            now=now,
+        )
+
+    return response
 
 @router.get(
     "/{opportunity_id}",
-    response_model=OpportunityRead,
+    response_model=OpportunityWithMatch,
 )
 def get_opportunity(
     opportunity_id: int,
+    current_user: User | None = Depends(get_optional_current_user),
     db: Session = Depends(get_db),
-) -> Opportunity:
-    return get_opportunity_or_404(
+) -> OpportunityWithMatch:
+    opportunity = get_opportunity_or_404(
         db,
         opportunity_id,
+    )
+
+    profile = get_profile_for_user(
+        db,
+        current_user,
+    )
+
+    return build_opportunity_response(
+        opportunity,
+        profile=profile,
+        now=datetime.now(timezone.utc),
     )
 
 
@@ -164,8 +234,7 @@ def update_opportunity(
     opportunity_data: OpportunityUpdate,
     db: Session = Depends(get_db),
 ) -> Opportunity:
-    # include_inactive=True позволяет через PATCH вернуть запись:
-    # {"is_active": true}
+
     opportunity = get_opportunity_or_404(
         db,
         opportunity_id,
@@ -239,8 +308,6 @@ def delete_opportunity(
         include_inactive=True,
     )
 
-    # Soft delete: запись остаётся в базе,
-    # но больше не показывается обычным пользователям.
     opportunity.is_active = False
 
     db.commit()

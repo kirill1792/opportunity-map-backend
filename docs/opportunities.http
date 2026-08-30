@@ -8,7 +8,7 @@ Content-Type: application/json
   "source_url": "https://education.tbank.ru/start/analyst/",
   "type": "internship",
   "image_url": "https://res.cloudinary.com/nu2kfjya/image/upload/v1785080510/aHR0cHM6Ly9jZG4udGJhbmsucnUvc3RhdGljL3BhZ2VzL2ZpbGVzLzkzZjhmZGNlLTIwYWMtNDYxZi05NWZhLWI4YTZiNTM1MmIyNS5wbmc_hyql1e.webp",
-  "field": "IT",
+  "field": "data_analytics",
   "level": "beginner",
   "format": "hybrid",
   "location": null,
@@ -20,23 +20,98 @@ Content-Type: application/json
   "estimated_effort": 20,
   "eligibility": "Студенты и начинающие специалисты",
   "required_skills": {
-    "Командная работа": 3,
-    "Математика": 4,
-    "Статистика": 3,
-    "Аналитика": 3,
-    "Программирование": 2
+    "teamwork": 3,
+    "data_analysis": 4,
+    "statistics": 3,
+    "optimization": 3,
+    "algorithms": 2
   },
   "nice_to_have_skills": {
-    "Python": 2,
-    "NumPy": 3,
-    "Pandas": 2,
-    "Matplotlib": 2,
-    "SQL": 1
+    "python": 2,
+    "numpy": 3,
+    "pandas": 2,
+    "matplotlib": 2,
+    "sql": 1
   },
   "tags": [
     "стажировка",
     "аналитика",
     "статистика"
+  ]
+}
+
+### Создать opportunity
+POST http://127.0.0.1:8000/opportunities
+Content-Type: application/json
+
+{
+  "title": "ICPC",
+  "description": "Командное студенческое международное соревнование по спортивному программированию",
+  "source_url": "https://icpc.global/",
+  "type": "competition",
+  "image_url": "https://res.cloudinary.com/nu2kfjya/image/upload/v1785078923/icpc_foundation_amnb7d.svg",
+  "field": "competitive_programming",
+  "level": "any",
+  "format": "offline",
+  "location": null,
+  "deadline": null,
+  "start_date": null,
+  "end_date": null,
+  "language": "English",
+  "is_paid": false,
+  "estimated_effort": 5,
+  "eligibility": "Студенты",
+  "required_skills": {
+    "teamwork": 4,
+    "optimization": 4,
+    "algorithms": 5
+  },
+  "nice_to_have_skills": {
+    "python": 3
+  },
+  "tags": [
+    "алгоритмы",
+    "программирование"
+  ]
+}
+
+### Создать opportunity
+POST http://127.0.0.1:8000/opportunities
+Content-Type: application/json
+
+{
+  "title": "Хакатон «Лидеры цифровой трансформации»",
+  "description": "Командный хакатон по разработке цифровых решений для городских задач.",
+  "source_url": "https://i.moscow/lct",
+  "type": "hackathon",
+  "image_url": "https://res.cloudinary.com/nu2kfjya/image/upload/v1784735873/lct_uv7jbo.jpg",
+  "field": "fullstack_development",
+  "level": "any",
+  "format": "online",
+  "location": null,
+  "deadline": null,
+  "start_date": null,
+  "end_date": null,
+  "language": "Русский",
+  "is_paid": true,
+  "estimated_effort": 20,
+  "eligibility": "Студенты и молодые специалисты",
+  "required_skills": {
+    "teamwork": 4,
+    "presentation": 3,
+    "rest_api": 3,
+    "git": 2,
+    "sql": 3,
+    "docker": 2,
+    "databases": 2
+  },
+  "nice_to_have_skills": {
+    "python": 3,
+    "technical_writing": 3
+  },
+  "tags": [
+    "разработка",
+    "цифровизация"
   ]
 }
 

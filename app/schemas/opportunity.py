@@ -14,6 +14,7 @@ from app.core.taxonomy import (
     validate_disjoint_skill_groups,
     validate_skill_requirements,
 )
+from app.schemas.matching import MatchingResult
 
 
 class OpportunityBase(BaseModel):
@@ -209,3 +210,7 @@ class OpportunityRead(OpportunityBase):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class OpportunityWithMatch(OpportunityRead):
+    match: MatchingResult | None = None
