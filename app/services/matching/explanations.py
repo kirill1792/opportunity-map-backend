@@ -143,7 +143,7 @@ def _generate_warnings(
     if skill_result.missing_skills:
         gaps = [
             f"{_label(skill.skill)} "
-            f"({skill.current_level} to {skill.required_level})"
+            f"(ваш: {skill.current_level}, нужно: {skill.required_level})"
             for skill in skill_result.missing_skills[:3]
         ]
         warnings.append(f"Нехватка обязательных навыков: {', '.join(gaps)}")

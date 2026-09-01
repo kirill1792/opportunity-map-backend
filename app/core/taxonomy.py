@@ -1,4 +1,4 @@
-from app.models.enums import OpportunityType
+from app.models.enums import OpportunityFormat
 
 
 ALLOWED_SKILLS = {
@@ -87,7 +87,7 @@ ALLOWED_GOALS = {
 
 
 ALLOWED_PREFERRED_FORMATS = {
-    opportunity_type.value for opportunity_type in OpportunityType
+    pref_for.value for pref_for in OpportunityFormat
 }
 
 

@@ -149,7 +149,6 @@ def get_opportunities(
         .limit(limit)
     )
 
-    # Здесь пока действительно ORM-объекты.
     opportunities = db.scalars(statement).all()
 
     profile = get_profile_for_user(
@@ -158,7 +157,7 @@ def get_opportunities(
     )
     calculation_time = datetime.now(timezone.utc)
 
-    # А здесь ORM преобразуется в API-схемы с optional matching.
+
     return [
         build_opportunity_response(
             opportunity,

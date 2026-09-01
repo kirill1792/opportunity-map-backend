@@ -47,7 +47,7 @@ X-Dev-User-Id: 1
 ### Update my profile
 PUT http://127.0.0.1:8000/profile/me
 Content-Type: application/json
-X-Dev-User-Id: 2
+X-Dev-User-Id: 1
 
 {
   "name": "Kirill",
